@@ -29,9 +29,14 @@ iptables -P OUTPUT REJECT
 BWG=5Mbit #Podriamos decir que es el ancho de banda general que tendrá, en este caso 5 mb (bajada y subida)
 DEV=ens8 #Interfaz de debian que compartirá el enlace
 
-MAC1=<mac> //direcciones mac de los clientes
-MAC2=<mac> //direcciones mac de los clientes
-MAC3=<mac> //direcciones mac de los clientes	
+while read -r linea
+do
+    IFS='='
+    read -a parametros <<< "$linea"
+    if [ ${parametros[0]} == "MAC1" ]; then MAC1=${parametros[1]}; fi
+    if [ ${parametros[0]} == "MAC2" ]; then MAC2=${parametros[1]}; fi
+    if [ ${parametros[0]} == "MAC3" ]; then MAC3=${parametros[1]}; fi
+done < ../confs/MACS.conf	
 
 insmod sch_htb 2> /dev/null
 tc qdisc add dev $DEV root handle 1: htb default 0xA

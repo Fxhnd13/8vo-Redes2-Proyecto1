@@ -1,5 +1,5 @@
 #LEYENDO EL ARCHIVO DE TEXTO ENLACE.CONF------------------------------------------------------
-echo "Leyendo el archivo de texto enlace------------------------------------------------------"
+echo "Leyendo el archivo de texto enlace-----------------------------------------------------------------------------------------------------------------------"
 while read -r linea
 do
     IFS='='
@@ -12,7 +12,7 @@ echo "El ancho de banda total es de: ${BWG}Kbit"
 echo
 
 #LEYENDO EL ARCHIVO DE TEXTO MODO.CONF--------------------------------------------------------
-echo "Leyendo el archivo de texto modo--------------------------------------------------------"
+echo "Leyendo el archivo de texto modo-------------------------------------------------------------------------------------------------------------------------"
 while read -r linea
 do
   #echo "$linea"
@@ -25,7 +25,7 @@ if [ $MODE -eq 2 ]; then echo "El modo de configuración es dinámico."; fi
 echo
 
 #LEYENDO EL ARCHIVO DE TEXTO USUARIO-BW.CONF-------------------------------------------------
-echo "Leyendo el archivo de texto usuario-bw y escribiendo en crontab------------------------"
+echo "Leyendo el archivo de texto usuario-bw y escribiendo en crontab------------------------------------------------------------------------------------------"
 if [ $MODE -eq 2 ]; then CEIL="ceil ${BWG}Kbit"; fi
 while read -r linea
 do
@@ -46,7 +46,7 @@ done < ../confs/usuario_bw.conf
 echo
 
 #LEYENDO EL ARCHIVO DE TEXTO USUARIO-PROTO.CONF-----------------------------------------------
-echo "Leyendo el archivo de texto usuario-proto-----------------------------------------------"
+echo "Leyendo el archivo de texto usuario-proto---------------------------------------------------------------------------------------------------------------"
 while read -r linea
 do
     IFS=','
