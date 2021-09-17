@@ -60,7 +60,7 @@ filter_mac() {
 } 
 
 tc class add dev $DEV parent 1:1 classid 1:11 htb rate 0Mbit //para la modalidad estricta
-tc class add dev $DEV parent 1:1 classid 1:12 htb rate 0Mbit //para la modalidad dinamica (usamos el total establecido en el doc enlace.conf)
+tc class add dev $DEV parent 1:1 classid 1:12 htb rate 0Mbit //para la modalidad estricta
 tc class add dev $DEV parent 1:1 classid 1:13 htb rate 0Mbit //para la modalidad estricta
 
 filter_mac $MAC1 1:11      
