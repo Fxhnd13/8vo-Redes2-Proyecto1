@@ -1,6 +1,3 @@
-#$1 BWG
-#$2 MODE
-
 #Verificacion de dependencias
 if ! command -v tc &> /dev/null
 then
@@ -20,15 +17,18 @@ then
     exit
 fi
 
-#Configuración inicial iptables
-iptables -P INPUT REJECT
-iptables -P FORWARD REJECT
-iptables -P OUTPUT REJECT
+#Configuración inicial iptables para rechazar TODA conexion de paquetes que no sea establecida
+#en el archivo usuario_proto.conf
+#Estas son politicas 
+iptables -P INPUT DROP 
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP
 
-#Configuración tc htb nodo raíz
-BWG=5Mbit #Podriamos decir que es el ancho de banda general que tendrá, en este caso 5 mb (bajada y subida)
-DEV=ens8 #Interfaz de debian que compartirá el enlace
+#Configuración tc htb nodo raíz quien tendrá las clases hijas encargadas de regular el ancho
+#de banda por mac
+DEV=ens8 #Interfaz de debian que compartirá el enlace con los clientes 
 
+#Leyendo las direcciones mac de los clientes
 while read -r linea
 do
     IFS='='
@@ -38,18 +38,25 @@ do
     if [ ${parametros[0]} == "MAC3" ]; then MAC3=${parametros[1]}; fi
 done < ../confs/MACS.conf	
 
+#No sé que hace esta linea, pero no tocar porque funciona
 insmod sch_htb 2> /dev/null
+
+#Creamos el nodo raíz con tc htb
 tc qdisc add dev $DEV root handle 1: htb default 0xA
 
 #Configuración tc htb nodos hojas
+#Esta linea es utilizada (al concatenar con las de abajo) para matchear la mac en el filtrado
+#de ancho de banda
 TCF="tc filter add dev $DEV parent 1: protocol ip prio 5 u32 match u16 0x0800 0xFFFF at -2" //Esto es primordial para encontrar el protocolo ip ¿sólo ip? 
 
 filter_mac() {
     M0=$(echo $1 | cut -d : -f 1)$(echo $1 | cut -d : -f 2)
     M1=$(echo $1 | cut -d : -f 3)$(echo $1 | cut -d : -f 4)
     M2=$(echo $1 | cut -d : -f 5)$(echo $1 | cut -d : -f 6)
-    $TCF match u16 0x${M2} 0xFFFF at -4 match u32 0x${M0}${M1} 0xFFFFFFFF at -8 flowid $2
-    $TCF match u32 0x${M1}${M2} 0xFFFFFFFF at -12 match u16 0x${M0} 0xFFFF at -14 flowid $2
+    
+    # mac aa:aa:aa:aa:aa:aa
+    $TCF match u16 0x${M2} 0xFFFF at -4 match u32 0x${M0}${M1} 0xFFFFFFFF at -8 flowid $2 #matcheamos la mac si es origen
+    $TCF match u32 0x${M1}${M2} 0xFFFFFFFF at -12 match u16 0x${M0} 0xFFFF at -14 flowid $2 #matcheamos la mac si es destino, probablemente esto no sea útil
 } 
 
 tc class add dev $DEV parent 1:1 classid 1:11 htb rate 0Mbit //para la modalidad estricta
