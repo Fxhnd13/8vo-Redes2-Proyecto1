@@ -50,22 +50,18 @@ while read -r linea
 do
     IFS=','
     read -a parametros <<< "$linea"
-
     if [ ${#parametros[@]} -eq 4 ]; then #Serian 4 parametros mac,protocolo,horainicio,horafin
-      echo "iptables -I FORWARD 1 -p icmp -m mac --mac-source ${parametros[0]} -m time --timestart ${parametros[2]} --timestop ${parametros[3]} -j ACCEPT"
-      echo "iptables -I FORWARD 1 -p icmp -m state --state RELATED,ESTABLISHED -m time --timestart ${parametros[2]} --timestop ${parametros[3]} -j ACCEPT"
+      ./iptable-command.sh 0 icmp ${parametros[0]} ${parametros[2]} ${parametros[3]}
     fi
 
     if [ ${#parametros[@]} -eq 5 ]; then #Serian 5 parametros mac,protocolo,puerto(s),horainicio,horafin
       IFS=':'
       read -a puertos <<< "${parametros[2]}"
-
+      IFS=""
       if [ ${#puertos[@]} -eq 2 ]; then
-        echo "iptables -I FORWARD 1 -p ${parametros[1]} -m mac --mac-source ${parametros[0]} -m ${parametros[1]} --dport ${puertos[0]}:${puertos[1]} -m time --timestart ${parametros[3]} --timestop ${parametros[4]} -j ACCEPT"
-        echo "iptables -I FORWARD 1 -p ${parametros[1]} -m state --state RELATED,ESTABLISHED -m ${parametros[1]} --sport ${puertos[0]}:${puertos[1]} -m time --timestart ${parametros[3]} --timestop ${parametros[4]} -j ACCEPT"
+        ./iptable-command.sh 1 ${parametros[1]} ${parametros[0]} ${parametros[3]} ${parametros[4]} ${puertos[0]} ${puertos[1]}
       else 
-        echo "iptables -I FORWARD 1 -p ${parametros[1]} -m mac --mac-source ${parametros[0]} -m ${parametros[1]} --dport ${parametros[2]} -m time --timestart ${parametros[3]} --timestop ${parametros[4]} -j ACCEPT"
-        echo "iptables -I FORWARD 1 -p ${parametros[1]} -m state --state RELATED,ESTABLISHED -m ${parametros[1]} --sport ${parametros[2]} -m time --timestart ${parametros[3]} --timestop ${parametros[4]} -j ACCEPT"
+        ./iptable-command.sh 1 ${parametros[1]} ${parametros[0]} ${parametros[3]} ${parametros[4]} ${parametros[2]}
       fi
 
     fi
