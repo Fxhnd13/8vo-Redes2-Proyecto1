@@ -47,7 +47,7 @@ tc qdisc add dev $DEV root handle 1: htb default 0xA
 #Configuración tc htb nodos hojas
 #Esta linea es utilizada (al concatenar con las de abajo) para matchear la mac en el filtrado
 #de ancho de banda
-TCF="tc filter add dev $DEV parent 1: protocol ip prio 5 u32 match u16 0x0800 0xFFFF at -2" //Esto es primordial para encontrar el protocolo ip ¿sólo ip? 
+#TCF="tc filter add dev $DEV parent 1: protocol ip prio 5 u32 match u16 0x0800 0xFFFF at -2"
 
 filter_mac() {
     M0=$(echo $1 | cut -d : -f 1)$(echo $1 | cut -d : -f 2)
@@ -55,16 +55,16 @@ filter_mac() {
     M2=$(echo $1 | cut -d : -f 5)$(echo $1 | cut -d : -f 6)
     
     # mac aa:aa:aa:aa:aa:aa
-    $TCF match u16 0x${M2} 0xFFFF at -4 match u32 0x${M0}${M1} 0xFFFFFFFF at -8 flowid $2 #matcheamos la mac si es origen
-    $TCF match u32 0x${M1}${M2} 0xFFFFFFFF at -12 match u16 0x${M0} 0xFFFF at -14 flowid $2 #matcheamos la mac si es destino, probablemente esto no sea útil
-} 
+    tc filter add dev $DEV parent 1: protocol ip prio 5 u32 match u16 0x0800 0xFFFF at -2 match u16 0x${M2} 0xFFFF at -4 match u32 0x${M0}${M1} 0xFFFFFFFF at -8 flowid $2 #matcheamos la mac si es origen
+    tc filter add dev $DEV parent 1: protocol ip prio 5 u32 match u16 0x0800 0xFFFF at -2 match u32 0x${M1}${M2} 0xFFFFFFFF at -12 match u16 0x${M0} 0xFFFF at -14 flowid $2 #matcheamos la mac si es destino, probablemente esto no sea útil
+}
 
-tc class add dev $DEV parent 1:1 classid 1:11 htb rate 0Mbit //para la modalidad estricta
-tc class add dev $DEV parent 1:1 classid 1:12 htb rate 0Mbit //para la modalidad estricta
-tc class add dev $DEV parent 1:1 classid 1:13 htb rate 0Mbit //para la modalidad estricta
+tc class add dev $DEV parent 1:1 classid 1:11 htb rate 1Kbit
+tc class add dev $DEV parent 1:1 classid 1:12 htb rate 1Kbit
+tc class add dev $DEV parent 1:1 classid 1:13 htb rate 1Kbit
 
-filter_mac $MAC1 1:11      
-filter_mac $MAC2 1:12      
-filter_mac $MAC3 1:13      
+filter_mac $MAC1 1:11
+filter_mac $MAC2 1:12
+filter_mac $MAC3 1:13
 
 echo "Se han finalizado las configuraciones predeterminadas iniciales..."
