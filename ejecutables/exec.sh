@@ -40,7 +40,7 @@ do
     IFS=""
     #Programar los cambios en el ancho de banda
     ./insertar-crontab.sh ${horarios_inicio[1]} ${horarios_inicio[0]} $BWTT ${parametros[0]} $CEIL
-    ./insertar-crontab.sh ${horarios_fin[1]} ${horarios_fin[0]} 0 ${parametros[0]}
+    ./insertar-crontab.sh ${horarios_fin[1]} ${horarios_fin[0]} 1 ${parametros[0]}
 done < ../confs/usuario_bw.conf
 echo
 
@@ -61,7 +61,7 @@ do
       if [ ${#puertos[@]} -eq 2 ]; then
         ./iptable-command.sh 1 ${parametros[1]} ${parametros[0]} ${parametros[3]} ${parametros[4]} ${puertos[0]} ${puertos[1]}
       else 
-        ./iptable-command.sh 1 ${parametros[1]} ${parametros[0]} ${parametros[3]} ${parametros[4]} ${parametros[2]}
+        ./iptable-command.sh 2 ${parametros[1]} ${parametros[0]} ${parametros[3]} ${parametros[4]} ${parametros[2]}
       fi
 
     fi
