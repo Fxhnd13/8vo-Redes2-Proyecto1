@@ -18,7 +18,7 @@ up = <cantidad en Mbps>`
 
 Los tipos pueden ser:
 * 1 = (fijo) de este modo el ancho de banda será únicamente el especificado, no más.
-* 2 = (dinámico) de este modo el ancho de banda será como mínimo lo especificado o más.
+* 0 = (dinámico) de este modo el ancho de banda será como mínimo lo especificado o más.
 
 ### Archivo usuario_BW.conf
   Este archivo definirá la configuración por MAC del ancho de banda que tendrá cada equipo conectado, su estructura será:
@@ -41,9 +41,12 @@ Los tipos pueden ser:
   Este script debe ser el primero en ejecutarse, este da por sentado las politicas y restricciones iniciales que tendrá el sistema, creando las clases para cada
 equipo cliente con un ancho de banda 0Kbit y denegando el envio de paquetes que no cumplan con ninguna regla.
 
-### insertar-crontab.sh
+### tc-change-class-command.sh
   Este script será ejecutado dentro de otro, este programará tareas a horas específicas para que sean ejecutadas, y de esta forma cambiar el ancho de banda del que 
 dispondra determinado cliente en determinado momento.
+
+### iptables-command.sh
+  Este script programará tareas a horas específicas que serán ejecutadas para agregar las reglas a iptables en los momentos que corresponda, así como eliminarlas según haga falta.
 
 ### limpieza.sh
   Este script deberá ser ejecutado cuando deseen eliminarse todas las politicas escritas en ejecuciones anteriores.
